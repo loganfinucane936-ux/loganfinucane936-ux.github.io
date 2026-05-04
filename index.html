@@ -1,133 +1,212 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Notes Tracker</title>
+  <title>Student Planner</title>
   <link rel="icon" type="image/png" href="logo.png">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial;
+      margin: 0;
       background: #f4f4f4;
       text-align: center;
-      margin: 0;
-      padding: 0;
+    }
+
+    h1 {
+      margin: 20px;
     }
 
     .container {
-      background: white;
-      width: 320px;
-      margin: 60px auto;
+      display: flex;
+      justify-content: space-around;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      flex-wrap: wrap;
     }
 
-    h2 {
-      margin-bottom: 15px;
+    .box {
+      background: white;
+      width: 300px;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      margin: 10px;
     }
 
     input {
       width: 80%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 8px;
+      margin: 5px 0;
     }
 
     button {
-      padding: 8px 12px;
-      border: none;
-      background: #4CAF50;
-      color: white;
-      border-radius: 6px;
+      padding: 6px 10px;
       cursor: pointer;
-    }
-
-    button:hover {
-      background: #45a049;
     }
 
     ul {
       list-style: none;
       padding: 0;
-      margin-top: 15px;
     }
 
     li {
       background: #eee;
       margin: 6px 0;
-      padding: 10px;
+      padding: 8px;
       border-radius: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .delete {
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 4px 8px;
       cursor: pointer;
     }
 
-    .delete:hover {
-      background: darkred;
+    .done {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .trash {
+      cursor: pointer;
+      color: red;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .trash:hover {
+      background: #ffdddd;
+      transform: scale(1.1);
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h2>My Notes Tracker</h2>
 
-    <input id="noteInput" placeholder="Type a note">
-    <br>
+<h1>📚 Student Planner</h1>
+
+<div class="container">
+
+  <!-- NOTES -->
+  <div class="box">
+    <h2>Notes</h2>
+    <input id="noteInput" placeholder="Add note">
     <button onclick="addNote()">Add</button>
-
     <ul id="notesList"></ul>
   </div>
 
-  <script>
-    let notes = JSON.parse(localStorage.getItem("notes")) || [];
+  <!-- HOMEWORK -->
+  <div class="box">
+    <h2>Homework</h2>
+    <input id="homeworkInput" placeholder="Add homework">
+    <button onclick="addHomework()">Add</button>
+    <ul id="homeworkList"></ul>
+  </div>
 
-    function renderNotes() {
-      let list = document.getElementById("notesList");
-      list.innerHTML = "";
+  <!-- TO DO -->
+  <div class="box">
+    <h2>To Do</h2>
+    <input id="todoInput" placeholder="Add task">
+    <button onclick="addTodo()">Add</button>
+    <ul id="todoList"></ul>
+  </div>
 
-      notes.forEach((note, index) => {
-        let li = document.createElement("li");
+</div>
 
-        li.innerHTML = `
-          ${note}
-          <button class="delete" onclick="deleteNote(${index})">X</button>
-        `;
+<script>
+  let notes = JSON.parse(localStorage.getItem("notes")) || [];
+  let homework = JSON.parse(localStorage.getItem("homework")) || [];
+  let todos = JSON.parse(localStorage.getItem("todos")) || [];
 
-        list.appendChild(li);
-      });
+  let doneNotes = JSON.parse(localStorage.getItem("doneNotes")) || [];
+  let doneHomework = JSON.parse(localStorage.getItem("doneHomework")) || [];
+  let doneTodos = JSON.parse(localStorage.getItem("doneTodos")) || [];
+
+  function renderAll() {
+    renderList("notes", notes, doneNotes, "notesList");
+    renderList("homework", homework, doneHomework, "homeworkList");
+    renderList("todos", todos, doneTodos, "todoList");
+  }
+
+  function renderList(type, arr, doneArr, listId) {
+    document.getElementById(listId).innerHTML =
+      arr.map((item, i) => `
+        <li class="${doneArr[i] ? 'done' : ''}">
+          <span onclick="toggleDone('${type}', ${i})">${item}</span>
+          <span class="trash" onclick="del('${type}',${i})">X</span>
+        </li>
+      `).join("");
+  }
+
+  function toggleDone(type, index) {
+    let arr = getDoneArray(type);
+    arr[index] = !arr[index];
+    saveDone(type, arr);
+    renderAll();
+  }
+
+  function getDoneArray(type) {
+    if (type === "notes") return doneNotes;
+    if (type === "homework") return doneHomework;
+    return doneTodos;
+  }
+
+  function saveDone(type, arr) {
+    if (type === "notes") {
+      doneNotes = arr;
+      localStorage.setItem("doneNotes", JSON.stringify(doneNotes));
     }
-
-    function addNote() {
-      let input = document.getElementById("noteInput");
-      let note = input.value.trim();
-
-      if (note === "") return;
-
-      notes.push(note);
-      localStorage.setItem("notes", JSON.stringify(notes));
-
-      input.value = "";
-      renderNotes();
+    if (type === "homework") {
+      doneHomework = arr;
+      localStorage.setItem("doneHomework", JSON.stringify(doneHomework));
     }
-
-    function deleteNote(index) {
-      notes.splice(index, 1);
-      localStorage.setItem("notes", JSON.stringify(notes));
-      renderNotes();
+    if (type === "todos") {
+      doneTodos = arr;
+      localStorage.setItem("doneTodos", JSON.stringify(doneTodos));
     }
+  }
 
-    renderNotes();
-  </script>
+  function addNote() {
+    let v = document.getElementById("noteInput").value.trim();
+    if (!v) return;
+    notes.push(v);
+    localStorage.setItem("notes", JSON.stringify(notes));
+    document.getElementById("noteInput").value = "";
+    renderAll();
+  }
+
+  function addHomework() {
+    let v = document.getElementById("homeworkInput").value.trim();
+    if (!v) return;
+    homework.push(v);
+    localStorage.setItem("homework", JSON.stringify(homework));
+    document.getElementById("homeworkInput").value = "";
+    renderAll();
+  }
+
+  function addTodo() {
+    let v = document.getElementById("todoInput").value.trim();
+    if (!v) return;
+    todos.push(v);
+    localStorage.setItem("todos", JSON.stringify(todos));
+    document.getElementById("todoInput").value = "";
+    renderAll();
+  }
+
+  function del(type, index) {
+    if (type === "notes") notes.splice(index,1);
+    if (type === "homework") homework.splice(index,1);
+    if (type === "todos") todos.splice(index,1);
+
+    saveDone(type, getDoneArray(type).filter((_,i)=>i!==index));
+
+    localStorage.setItem("notes", JSON.stringify(notes));
+    localStorage.setItem("homework", JSON.stringify(homework));
+    localStorage.setItem("todos", JSON.stringify(todos));
+
+    renderAll();
+  }
+
+  renderAll();
+</script>
+
 </body>
 </html>
