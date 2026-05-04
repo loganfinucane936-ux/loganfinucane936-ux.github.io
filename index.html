@@ -2,43 +2,78 @@
 <html>
 <head>
   <title>Notes Tracker</title>
+  <link rel="icon" type="image/png" href="logo.png">
+
   <style>
     body {
-      font-family: Arial;
-      background: #f2f2f2;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
       text-align: center;
+      margin: 0;
+      padding: 0;
     }
 
     .container {
       background: white;
-      width: 300px;
-      margin: 50px auto;
+      width: 320px;
+      margin: 60px auto;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px gray;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      margin-bottom: 15px;
     }
 
     input {
       width: 80%;
-      padding: 8px;
+      padding: 10px;
       margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
     button {
-      padding: 8px;
+      padding: 8px 12px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      border-radius: 6px;
       cursor: pointer;
+    }
+
+    button:hover {
+      background: #45a049;
     }
 
     ul {
       list-style: none;
       padding: 0;
+      margin-top: 15px;
     }
 
     li {
-      background: #e0e0e0;
-      margin: 5px;
-      padding: 8px;
+      background: #eee;
+      margin: 6px 0;
+      padding: 10px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .delete {
+      background: red;
+      color: white;
+      border: none;
       border-radius: 5px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .delete:hover {
+      background: darkred;
     }
   </style>
 </head>
@@ -55,19 +90,44 @@
   </div>
 
   <script>
+    let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+    function renderNotes() {
+      let list = document.getElementById("notesList");
+      list.innerHTML = "";
+
+      notes.forEach((note, index) => {
+        let li = document.createElement("li");
+
+        li.innerHTML = `
+          ${note}
+          <button class="delete" onclick="deleteNote(${index})">X</button>
+        `;
+
+        list.appendChild(li);
+      });
+    }
+
     function addNote() {
       let input = document.getElementById("noteInput");
-      let note = input.value;
+      let note = input.value.trim();
 
       if (note === "") return;
 
-      let li = document.createElement("li");
-      li.textContent = note;
-
-      document.getElementById("notesList").appendChild(li);
+      notes.push(note);
+      localStorage.setItem("notes", JSON.stringify(notes));
 
       input.value = "";
+      renderNotes();
     }
+
+    function deleteNote(index) {
+      notes.splice(index, 1);
+      localStorage.setItem("notes", JSON.stringify(notes));
+      renderNotes();
+    }
+
+    renderNotes();
   </script>
 </body>
 </html>
