@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Notes Tracker</title>
+</head>
+<body>
+  <h1>My Notes Tracker</h1>
+
+  <input id="noteInput" placeholder="Type a note">
+  <button onclick="addNote()">Add</button>
+
+  <ul id="notesList"></ul>
+
+  <script>
+    function addNote() {
+      let input = document.getElementById("noteInput");
+      let note = input.value;
+
+      if (note === "") return;
+
+      let li = document.createElement("li");
+      li.textContent = note;
+
+      document.getElementById("notesList").appendChild(li);
+
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
