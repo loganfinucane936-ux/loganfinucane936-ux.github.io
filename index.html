@@ -2,14 +2,57 @@
 <html>
 <head>
   <title>Notes Tracker</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f2f2f2;
+      text-align: center;
+    }
+
+    .container {
+      background: white;
+      width: 300px;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px gray;
+    }
+
+    input {
+      width: 80%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #e0e0e0;
+      margin: 5px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>My Notes Tracker</h1>
+  <div class="container">
+    <h2>My Notes Tracker</h2>
 
-  <input id="noteInput" placeholder="Type a note">
-  <button onclick="addNote()">Add</button>
+    <input id="noteInput" placeholder="Type a note">
+    <br>
+    <button onclick="addNote()">Add</button>
 
-  <ul id="notesList"></ul>
+    <ul id="notesList"></ul>
+  </div>
 
   <script>
     function addNote() {
